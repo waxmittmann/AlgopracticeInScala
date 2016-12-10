@@ -1,9 +1,35 @@
 package me.max.wittmann.hackerrank
 
+import scala.io.StdIn
+
 object AngryChildren2 {
 
+  val DEBUG = false
+  def dPrint(str: String): Unit = {
+    if (DEBUG)
+      println(str)
+    else
+      Unit
+  }
+
   def main (args: Array[String]): Unit = {
-    println(solve(List(10, 100, 300, 200, 1000, 20, 30), 3))
+
+    val candiesNr = StdIn.readLine().toInt
+    val kidsNr = StdIn.readLine().toInt
+
+    val candies = (0 until candiesNr).toList.map(i => {
+      val v = StdIn.readLine().toInt
+      dPrint(s"Read $i $v")
+      v
+    })
+
+    dPrint(s"Candies: $candies, Kids: $kidsNr")
+
+    val result = solve(candies, kidsNr)
+    dPrint("Done readin'")
+    println(result)
+
+    //println(solve(List(10, 100, 300, 200, 1000, 20, 30), 3))
   }
 
   def solve(candies: List[Int], children: Int): Int = {
@@ -27,7 +53,7 @@ object AngryChildren2 {
             Math.abs(candiesS(i) - candiesS(j))
           }).sum).sum
 
-    println(s"Prefixes: $prefixes\nSeed value: $seedValue")
+    dPrint(s"Prefixes: $prefixes\nSeed value: $seedValue")
 
     val diffs =
       (children to candiesS.length - 1).foldLeft(List(seedValue))((r, i) => {
@@ -40,7 +66,7 @@ object AngryChildren2 {
         (i_minus_1 + i_diff - i_minus_k_diff) :: r
       })
 
-    println(s"Diffs: $diffs")
+    dPrint(s"Diffs: $diffs")
 
     val minDiff = diffs.min / 2
 
