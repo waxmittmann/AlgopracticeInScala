@@ -4,7 +4,7 @@ import scala.io.StdIn
 
 object AngryChildren2 {
 
-  val DEBUG = false
+  val DEBUG = true
   def dPrint(str: String): Unit = {
     if (DEBUG)
       println(str)
@@ -36,46 +36,42 @@ object AngryChildren2 {
     val candiesS = candies.sorted
 
     val prefixes =
-      candiesS
+      candiesS.drop(1)
         .foldLeft(candiesS.take(1))((li, cur) => {
-          (cur + li.head) :: li
+          val newLi = (cur + li.head) :: li
+          dPrint(s"Cur: $cur, li.head: ${li.head}, New: ${cur + li.head}, Li: $li, NewLi: $newLi")
+          newLi
         })
         .reverse
 
-//    (0 until candies.length - 1 - children).map(i => {
-//      prefixes(i + children - 1) - prefixes(i)
-//    }).min
+    val results = Array.fill(candiesS.length)(Integer.MAX_VALUE)
+    // Initialise by calculating the first value in O(children)
+    //(0 until children - 1).foreach(i => results(i))
+    results(children - 1) = 0
+    for (i <- 1 until children - 1) {
+      //We need to use diffs, not candiesS
+      dPrint(s"At $i, adding ${(i+1) * candiesS(i)}")
+      //results(children - 1) += (i+1) * candiesS(i)
 
-    val seedValue =
-      (0 to children-1).toList
-        .map(i => (0 to children - 1).toList
-          .map(j => {
-            Math.abs(candiesS(i) - candiesS(j))
-          }).sum).sum
+      results(children - 1) += (i+1) * (candiesS(i) - candiesS(i-1))
+    }
 
-    dPrint(s"Prefixes: $prefixes\nSeed value: $seedValue")
+    for (i <- children until candies.length) {
+      results(i) = results(i-1) +
+                    children * candiesS(i) +
+                    prefixes(i-1) - prefixes(i-children)
+    }
 
-    val diffs =
-      (children to candiesS.length - 1).foldLeft(List(seedValue))((r, i) => {
-        val i_minus_1: Int = r.head
+    val bestResult = results.min
 
-        val i_diff: Int = candiesS(i) * children - (prefixes(i) - prefixes(i - children)) //i-children-1?
+    dPrint(
+      s"""
+         |Prefixes: $prefixes
+         |Results:  ${results.toList}
+         |Best:     $bestResult
+       """.stripMargin)
 
-        val i_minus_k_diff: Int = candiesS(i - children) * children - (prefixes(i) - prefixes(i - children)) //i-children-1?
-
-        (i_minus_1 + i_diff - i_minus_k_diff) :: r
-      })
-
-    dPrint(s"Diffs: $diffs")
-
-    val minDiff = diffs.min / 2
-
-    minDiff
-
-
-//    (children + 1 until candies.length - 1).map(i => {
-//
-//    })
+    bestResult
   }
 
 }
